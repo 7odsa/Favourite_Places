@@ -11,7 +11,6 @@ class PlacesListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
 <<<<<<< HEAD
-      // test test
 =======
       // Test develop
 >>>>>>> develop
