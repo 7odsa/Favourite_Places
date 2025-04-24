@@ -10,7 +10,6 @@ class PlacesListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Test
       // test test
       appBar: AppBar(
         title: Text("Great Places"),
