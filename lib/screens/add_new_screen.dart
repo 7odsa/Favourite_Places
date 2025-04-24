@@ -4,6 +4,7 @@ import 'package:favorite_places/models/place.dart';
 import 'package:favorite_places/providers/places_provider.dart';
 import 'package:favorite_places/utils.dart';
 import 'package:favorite_places/widgets/image_input.dart';
+import 'package:favorite_places/widgets/location_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,6 +54,8 @@ class AddNewScreen extends ConsumerWidget {
                   _imageFile = imageFile;
                 },
               ),
+              SizedBox(height: 8),
+              LocationInput(),
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _onSavePressed,
