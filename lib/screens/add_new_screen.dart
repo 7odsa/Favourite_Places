@@ -26,50 +26,52 @@ class AddNewScreen extends ConsumerWidget {
       Navigator.of(context).pop();
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text("Add New Place")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                style: white16,
-                decoration: InputDecoration(labelText: "Title"),
-                maxLines: 1,
-                maxLength: 50,
-                onSaved: (newValue) {
-                  _title = newValue;
-                },
-                validator: (value) {
-                  // TODO
-                  if (value == null || value.isEmpty) return "a7a";
-                  return null;
-                },
-              ),
-              SizedBox(height: 8),
-              ImageInput(
-                onImagePicked: (imageFile) {
-                  _imageFile = imageFile;
-                },
-              ),
-              SizedBox(height: 8),
-              LocationInput(),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _onSavePressed,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.add),
-                    SizedBox(width: 8),
-                    Text("Add Place"),
-                  ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text("Add New Place")),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  style: white16,
+                  decoration: InputDecoration(labelText: "Title"),
+                  maxLines: 1,
+                  maxLength: 50,
+                  onSaved: (newValue) {
+                    _title = newValue;
+                  },
+                  validator: (value) {
+                    // TODO
+                    if (value == null || value.isEmpty) return "a7a";
+                    return null;
+                  },
                 ),
-              ),
-            ],
+                SizedBox(height: 8),
+                ImageInput(
+                  onImagePicked: (imageFile) {
+                    _imageFile = imageFile;
+                  },
+                ),
+                SizedBox(height: 8),
+                LocationInput(),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _onSavePressed,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.add),
+                      SizedBox(width: 8),
+                      Text("Add Place"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

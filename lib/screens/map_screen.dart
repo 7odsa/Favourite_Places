@@ -22,70 +22,64 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Hero(
-        tag: _chosedLocation,
-        child: FlutterMap(
-          options: MapOptions(
-            initialZoom: 15,
-            initialCenter: _chosedLocation,
-            onTap: _onMapTapped,
-          ),
-          children: [
-            TileLayer(
-              urlTemplate:
-                  'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
-              additionalOptions: const {'hl': 'ar'},
-              subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(centerTitle: true, title: Text("Pick a Location")),
+        body: Hero(
+          tag: _chosedLocation,
+          child: FlutterMap(
+            options: MapOptions(
+              initialZoom: 15,
+              initialCenter: _chosedLocation,
+              onTap: _onMapTapped,
             ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  rotate: true,
-                  point: _chosedLocation,
-                  child: const Icon(
-                    Icons.location_on,
-                    size: 35,
+            children: [
+              TileLayer(
+                urlTemplate:
+                    'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
+                additionalOptions: const {'hl': 'ar'},
+                subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    rotate: true,
+                    point: _chosedLocation,
+                    child: const Icon(
+                      Icons.location_on,
+                      size: 35,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+
+              Align(
+                alignment: Alignment.bottomRight,
+                child: TextButton.icon(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(Colors.amberAccent),
+                    elevation: WidgetStatePropertyAll(12),
+                  ),
+                  onPressed: () {
+                    _chosedLocation = widget.currentLocation;
+                    setState(() {});
+                  },
+                  icon: Icon(
+                    Icons.location_history,
                     color: Colors.blue,
+                    size: 24,
+                  ),
+                  label: Text(
+                    "Back to Your current location",
+                    style: TextTheme.of(
+                      context,
+                    ).bodyLarge!.copyWith(color: Colors.blue),
                   ),
                 ),
-              ],
-            ),
-            Align(
-              heightFactor: 1,
-              child: Text(
-                "Pick a Location",
-                style: TextTheme.of(
-                  context,
-                ).displaySmall!.copyWith(color: Colors.blue),
               ),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: TextButton.icon(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.amberAccent),
-                  elevation: WidgetStatePropertyAll(12),
-                ),
-                onPressed: () {
-                  _chosedLocation = widget.currentLocation;
-                  setState(() {});
-                },
-                icon: Icon(
-                  Icons.location_history,
-                  color: Colors.blue,
-                  size: 24,
-                ),
-                label: Text(
-                  "Back to Your current location",
-                  style: TextTheme.of(
-                    context,
-                  ).bodyLarge!.copyWith(color: Colors.blue),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

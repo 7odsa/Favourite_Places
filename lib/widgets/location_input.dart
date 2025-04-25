@@ -19,10 +19,9 @@ class _LocationInputState extends State<LocationInput> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
   }
 
-  void _getCurrentLocation() async {
+  void _getCurrentLocation([void Function()? onLocationRetrieved]) async {
     setState(() {
       isGettingLocation = true;
     });
@@ -57,12 +56,19 @@ class _LocationInputState extends State<LocationInput> {
       isGettingLocation = false;
       _pickedLocation = LatLng(locationData.latitude!, locationData.longitude!);
     });
+    if (onLocationRetrieved != null) onLocationRetrieved();
   }
 
   void onPickLocationPressed() async {
     if (isGettingLocation) return;
+    if (_pickedLocation == null) {
+      _getCurrentLocation(onPickLocationPressed);
+      return;
+    }
+
     LatLng? retrievedLocation = await Navigator.of(context).push(
       MaterialPageRoute(
+        fullscreenDialog: true,
         builder: (context) {
           return MapScreen(currentLocation: _pickedLocation!);
         },
