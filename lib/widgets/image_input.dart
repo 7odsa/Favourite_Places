@@ -66,7 +66,11 @@ class _ImageInputState extends State<ImageInput> {
       height: 250,
       width: double.infinity,
       alignment: Alignment.center,
-      child: content,
+      child: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: content,
+      ),
     );
   }
 }
