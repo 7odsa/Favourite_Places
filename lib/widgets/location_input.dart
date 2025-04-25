@@ -16,6 +16,12 @@ class _LocationInputState extends State<LocationInput> {
   LatLng? _pickedLocation;
   bool isGettingLocation = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
   void _getCurrentLocation() async {
     setState(() {
       isGettingLocation = true;
@@ -53,10 +59,18 @@ class _LocationInputState extends State<LocationInput> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
+  void onPickLocationPressed() async {
+    if (isGettingLocation) return;
+    LatLng? retrievedLocation = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return MapScreen(currentLocation: _pickedLocation!);
+        },
+      ),
+    );
+    _pickedLocation =
+        (retrievedLocation != null) ? retrievedLocation : _pickedLocation;
+    setState(() {});
   }
 
   @override
@@ -65,61 +79,8 @@ class _LocationInputState extends State<LocationInput> {
         isGettingLocation == true
             ? CircularProgressIndicator()
             : (_pickedLocation == null)
-            ? Text(
-              "No Location Chosen Yet.",
-              textAlign: TextAlign.center,
-              style: TextTheme.of(context).bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            )
-            : ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: _pickedLocation!,
-                  initialZoom: 15,
-                  onTap: _onMapTapped,
-                  interactionOptions: InteractionOptions(
-                    flags: InteractiveFlag.none,
-                  ),
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
-                    additionalOptions: const {'hl': 'ar'},
-
-                    userAgentPackageName: 'com..app',
-                    subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
-                  ),
-                  // MarkerLayer(
-                  //   markers: [
-                  //     Marker(
-                  //       point: _pickedLocation!,
-                  //       child: Icon(Icons.location_on),
-                  //     ),
-                  //   ],
-                  // ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.location_on,
-                      size: 35,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment(0, -0.35),
-                    child: Text(
-                      "Your current Location",
-                      style: TextTheme.of(context).titleMedium!.copyWith(
-                        color: const Color.fromARGB(255, 0, 108, 197),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            ? _noLocationText()
+            : _showLocation();
 
     return Column(
       children: [
@@ -164,18 +125,75 @@ class _LocationInputState extends State<LocationInput> {
     );
   }
 
-  void _onMapTapped(TapPosition tapPosition, LatLng point) {
-    _pickedLocation = point;
-    setState(() {});
-  }
+  Widget _showLocation() {
+    return Hero(
+      tag: _pickedLocation!,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: _pickedLocation!,
+            initialZoom: 15,
+            // onTap: _onMapTapped,
+            interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
+          ),
+          children: [
+            TileLayer(
+              urlTemplate:
+                  'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
+              additionalOptions: const {'hl': 'ar'},
 
-  void onPickLocationPressed() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return MapScreen(currentLocation: _pickedLocation!);
-        },
+              userAgentPackageName: 'com..app',
+              subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
+            ),
+            // MarkerLayer(
+            //   markers: [
+            //     Marker(
+            //       point: _pickedLocation!,
+            //       child: const Icon(
+            //         Icons.location_on,
+            //         size: 35,
+            //         color: Colors.blue,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            Align(
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.location_on,
+                size: 35,
+                color: Colors.blue,
+              ),
+            ),
+            Align(
+              alignment: Alignment(0, -0.35),
+              child: Text(
+                "Your current Location",
+                style: TextTheme.of(context).titleMedium!.copyWith(
+                  color: const Color.fromARGB(255, 0, 108, 197),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  Widget _noLocationText() {
+    return Text(
+      "No Location Chosen Yet.",
+      textAlign: TextAlign.center,
+      style: TextTheme.of(
+        context,
+      ).bodyLarge!.copyWith(color: Theme.of(context).colorScheme.onSurface),
+    );
+  }
+
+  // void _onMapTapped(TapPosition tapPosition, LatLng point) {
+  //   _pickedLocation = point;
+  //   print(_pickedLocation);
+  //   setState(() {});
+  // }
 }
