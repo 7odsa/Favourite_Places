@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -9,14 +10,18 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  LatLng _LocationDim = LatLng(50, 60);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: FlutterMap(
         options: MapOptions(
+          initialCenter: _LocationDim,
           onTap: (tapPosition, point) {
-            // TODO
+            _LocationDim = point;
+            print(_LocationDim);
           },
         ),
         children: [
