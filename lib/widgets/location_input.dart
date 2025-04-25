@@ -54,6 +54,12 @@ class _LocationInputState extends State<LocationInput> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget content =
         isGettingLocation == true
@@ -149,11 +155,7 @@ class _LocationInputState extends State<LocationInput> {
             ),
             TextButton.icon(
               icon: Icon(Icons.map, size: 24),
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => MapScreen()));
-              },
+              onPressed: onPickLocationPressed,
               label: Text("Pick a Location"),
             ),
           ],
@@ -165,5 +167,15 @@ class _LocationInputState extends State<LocationInput> {
   void _onMapTapped(TapPosition tapPosition, LatLng point) {
     _pickedLocation = point;
     setState(() {});
+  }
+
+  void onPickLocationPressed() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return MapScreen(currentLocation: _pickedLocation!);
+        },
+      ),
+    );
   }
 }
