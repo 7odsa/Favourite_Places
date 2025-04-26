@@ -24,7 +24,14 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(centerTitle: true, title: Text("Pick a Location")),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: onBackButtonPressed,
+          ),
+          centerTitle: true,
+          title: Text("Pick a Location"),
+        ),
         body: Hero(
           tag: _chosedLocation,
           child: FlutterMap(
@@ -85,7 +92,52 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _onMapTapped(tapPosition, point) async {
+  void onBackButtonPressed() {
+    LatLng sendBackLocation = widget.currentLocation;
+    if (_chosedLocation != widget.currentLocation) {
+      sendBackLocation = _chosedLocation;
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: const Text('Chose this location'),
+
+            actions: [
+              TextButton(
+                child: const Text('Stay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Stick on original Location'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _onPickedLocation(widget.currentLocation);
+                },
+              ),
+              TextButton(
+                child: Text(
+                  'Yep!',
+                  style: TextTheme.of(context).titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _onPickedLocation(sendBackLocation);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else
+      _onPickedLocation(sendBackLocation);
+  }
+
+  void _onMapTapped(TapPosition tapPosition, LatLng point) async {
     _chosedLocation = point;
 
     List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -131,7 +183,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
               onPressed: () {
                 Navigator.of(context).pop();
-                _onPickedLocation();
+                _onPickedLocation(_chosedLocation);
               },
             ),
           ],
@@ -143,7 +195,7 @@ class _MapScreenState extends State<MapScreen> {
     print(_chosedLocation);
   }
 
-  void _onPickedLocation() {
-    Navigator.of(context).pop(_chosedLocation);
+  void _onPickedLocation(LatLng location) {
+    if (mounted) Navigator.of(context).pop(location);
   }
 }

@@ -158,6 +158,8 @@ class _LocationInputState extends State<LocationInput> {
     );
     _pickedLocation =
         (retrievedLocation != null) ? retrievedLocation : _pickedLocation;
+
+    if (!mounted) return;
     setState(() {});
   }
 
