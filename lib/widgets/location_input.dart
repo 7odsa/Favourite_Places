@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:favorite_places/screens/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -15,10 +17,33 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   LatLng? _pickedLocation;
   bool isGettingLocation = false;
+  bool isThereConnection = false;
 
   @override
   void initState() {
     super.initState();
+    _checkInternetConnection();
+  }
+
+  Future<void> _checkInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+      }
+    } on SocketException catch (_) {
+      print('not connected');
+
+      setState(() {
+        isThereConnection = false;
+      });
+      return;
+    }
+
+    setState(() {
+      isThereConnection = true;
+    });
   }
 
   void _getCurrentLocation([void Function()? onLocationRetrieved]) async {
@@ -49,18 +74,24 @@ class _LocationInputState extends State<LocationInput> {
     }
 
     locationData = await location.getLocation();
+
     List<geocoding.Placemark> placemarks = await geocoding
         .placemarkFromCoordinates(52.2165157, 6.9437819);
-    print(placemarks[0].street);
+    print(placemarks[0].subLocality);
+
     setState(() {
       isGettingLocation = false;
       _pickedLocation = LatLng(locationData.latitude!, locationData.longitude!);
+      print(_pickedLocation!.latitude);
+      print(_pickedLocation!.longitude);
     });
+
     if (onLocationRetrieved != null) onLocationRetrieved();
   }
 
   void onPickLocationPressed() async {
-    if (isGettingLocation) return;
+    await _checkInternetConnection();
+    if (!isThereConnection || isGettingLocation) return;
     if (_pickedLocation == null) {
       _getCurrentLocation(onPickLocationPressed);
       return;
@@ -81,12 +112,16 @@ class _LocationInputState extends State<LocationInput> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content =
-        isGettingLocation == true
-            ? CircularProgressIndicator()
-            : (_pickedLocation == null)
-            ? _noLocationText()
-            : _showLocation();
+    Widget content;
+    if (isGettingLocation == true) {
+      content = CircularProgressIndicator();
+    } else if (_pickedLocation == null) {
+      content = _showText("No Location Chosen Yet.");
+    } else if (isThereConnection) {
+      content = _showLocation();
+    } else {
+      content = _showText("No Internet Connection");
+    }
 
     return Column(
       children: [
@@ -108,7 +143,8 @@ class _LocationInputState extends State<LocationInput> {
           children: [
             TextButton.icon(
               icon: Icon(Icons.location_on, size: 24),
-              onPressed: () {
+              onPressed: () async {
+                await _checkInternetConnection();
                 _getCurrentLocation();
               },
               label: Text("Get current Location"),
@@ -187,9 +223,9 @@ class _LocationInputState extends State<LocationInput> {
     );
   }
 
-  Widget _noLocationText() {
+  Widget _showText(String text) {
     return Text(
-      "No Location Chosen Yet.",
+      text,
       textAlign: TextAlign.center,
       style: TextTheme.of(
         context,
