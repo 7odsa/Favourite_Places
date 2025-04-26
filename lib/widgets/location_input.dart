@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:favorite_places/screens/map_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
@@ -22,10 +23,11 @@ class _LocationInputState extends State<LocationInput> {
   @override
   void initState() {
     super.initState();
-    _checkInternetConnection();
   }
 
-  Future<void> _checkInternetConnection() async {
+  Future<void> _checkInternetConnection([
+    void Function()? callingFunction,
+  ]) async {
     try {
       final result = await InternetAddress.lookup('example.com');
 
@@ -38,12 +40,51 @@ class _LocationInputState extends State<LocationInput> {
       setState(() {
         isThereConnection = false;
       });
+      _showDialog(
+        title: "No Internet Connection",
+        content:
+            "Your current location saved. \nBut can't show the Map, Due to connection Lost.",
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              callingFunction?.call();
+            },
+            child: Text("Try Again"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("Ok"),
+          ),
+        ],
+      );
+      // AlertDialog(
+      //   title: Text(),
+      //   content: Text(),
+      // );
       return;
     }
 
     setState(() {
       isThereConnection = true;
     });
+  }
+
+  void _showDialog({String? title, String? content, List<Widget>? actions}) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(title ?? ""),
+          content: SingleChildScrollView(
+            child: ListBody(children: [Text(content ?? "")]),
+          ),
+          actions: actions ?? [],
+        );
+      },
+    );
   }
 
   void _getCurrentLocation([void Function()? onLocationRetrieved]) async {
@@ -75,9 +116,11 @@ class _LocationInputState extends State<LocationInput> {
 
     locationData = await location.getLocation();
 
-    List<geocoding.Placemark> placemarks = await geocoding
-        .placemarkFromCoordinates(52.2165157, 6.9437819);
-    print(placemarks[0].subLocality);
+    // if (isThereConnection == true) {
+    //   List<geocoding.Placemark> placemarks = await geocoding
+    //       .placemarkFromCoordinates(52.2165157, 6.9437819);
+    //   print(placemarks[0].subLocality);
+    // }
 
     setState(() {
       isGettingLocation = false;
@@ -89,9 +132,15 @@ class _LocationInputState extends State<LocationInput> {
     if (onLocationRetrieved != null) onLocationRetrieved();
   }
 
+  void onGetCurrentLocatiomnPressed() async {
+    await _checkInternetConnection(onGetCurrentLocatiomnPressed);
+    _getCurrentLocation();
+  }
+
   void onPickLocationPressed() async {
-    await _checkInternetConnection();
+    await _checkInternetConnection(onPickLocationPressed);
     if (!isThereConnection || isGettingLocation) return;
+
     if (_pickedLocation == null) {
       _getCurrentLocation(onPickLocationPressed);
       return;
@@ -143,10 +192,7 @@ class _LocationInputState extends State<LocationInput> {
           children: [
             TextButton.icon(
               icon: Icon(Icons.location_on, size: 24),
-              onPressed: () async {
-                await _checkInternetConnection();
-                _getCurrentLocation();
-              },
+              onPressed: onGetCurrentLocatiomnPressed,
               label: Text("Get current Location"),
             ),
             Text(
