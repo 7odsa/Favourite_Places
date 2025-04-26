@@ -7,6 +7,7 @@ import 'package:favorite_places/widgets/image_input.dart';
 import 'package:favorite_places/widgets/location_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 
 class AddNewScreen extends ConsumerWidget {
   const AddNewScreen({super.key});
@@ -16,13 +17,23 @@ class AddNewScreen extends ConsumerWidget {
     final _formKey = GlobalKey<FormState>();
     String? _title;
     File? _imageFile;
+    LatLng? _location;
 
     void _onSavePressed() {
-      if (!_formKey.currentState!.validate() || _imageFile == null) return;
+      if (!_formKey.currentState!.validate() ||
+          _imageFile == null ||
+          _location == null)
+        return;
       _formKey.currentState!.save();
       ref
           .read(placesProvider.notifier)
-          .addnewPlace(Place(title: _title!, imageFilePath: _imageFile!));
+          .addnewPlace(
+            Place(
+              title: _title!,
+              imageFilePath: _imageFile!,
+              location: _location!,
+            ),
+          );
       Navigator.of(context).pop();
     }
 
@@ -56,7 +67,12 @@ class AddNewScreen extends ConsumerWidget {
                   },
                 ),
                 SizedBox(height: 8),
-                LocationInput(),
+                LocationInput(
+                  onLocationPicked: (location) {
+                    _location = location;
+                    print(_location);
+                  },
+                ),
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _onSavePressed,

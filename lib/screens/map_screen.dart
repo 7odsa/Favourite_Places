@@ -133,8 +133,9 @@ class _MapScreenState extends State<MapScreen> {
           );
         },
       );
-    } else
+    } else {
       _onPickedLocation(sendBackLocation);
+    }
   }
 
   void _onMapTapped(TapPosition tapPosition, LatLng point) async {
@@ -147,12 +148,12 @@ class _MapScreenState extends State<MapScreen> {
 
     String areaName = placemarks[0].locality!;
     String streetName = placemarks[0].thoroughfare!;
-    String additionalInfo = placemarks[0].street!;
+    // String additionalInfo = placemarks[0].street!;
 
-    print(placemarks[0].locality!);
-    print(placemarks[0].administrativeArea!);
-    print(placemarks[0].street!);
-    print(placemarks[0].thoroughfare!);
+    // print(placemarks[0].locality!);
+    // print(placemarks[0].administrativeArea!);
+    // print(placemarks[0].street!);
+    // print(placemarks[0].thoroughfare!);
 
     if (!mounted) return;
 
@@ -163,9 +164,7 @@ class _MapScreenState extends State<MapScreen> {
         return CupertinoAlertDialog(
           title: const Text('Wanna Pick this Location?'),
           content: SingleChildScrollView(
-            child: ListBody(
-              children: [Text('At: \n${areaName}\n${streetName}')],
-            ),
+            child: ListBody(children: [Text('At: \n$areaName\n$streetName')]),
           ),
           actions: [
             TextButton(
@@ -192,7 +191,7 @@ class _MapScreenState extends State<MapScreen> {
     );
 
     setState(() {});
-    print(_chosedLocation);
+    // print(_chosedLocation);
   }
 
   void _onPickedLocation(LatLng location) {

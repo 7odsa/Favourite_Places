@@ -4,12 +4,14 @@ import 'package:favorite_places/screens/map_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
+// import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:location/location.dart';
 import 'package:latlong2/latlong.dart';
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  const LocationInput({super.key, required this.onLocationPicked});
+
+  final void Function(LatLng location) onLocationPicked;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -19,11 +21,6 @@ class _LocationInputState extends State<LocationInput> {
   LatLng? _pickedLocation;
   bool isGettingLocation = false;
   bool isThereConnection = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<void> _checkInternetConnection([
     void Function()? callingFunction,
@@ -129,6 +126,8 @@ class _LocationInputState extends State<LocationInput> {
       print(_pickedLocation!.longitude);
     });
 
+    widget.onLocationPicked(_pickedLocation!);
+
     if (onLocationRetrieved != null) onLocationRetrieved();
   }
 
@@ -158,8 +157,8 @@ class _LocationInputState extends State<LocationInput> {
     );
     _pickedLocation =
         (retrievedLocation != null) ? retrievedLocation : _pickedLocation;
-
     if (!mounted) return;
+    widget.onLocationPicked(_pickedLocation!);
     setState(() {});
   }
 
