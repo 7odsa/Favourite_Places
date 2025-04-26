@@ -94,6 +94,13 @@ class _MapScreenState extends State<MapScreen> {
     );
 
     String areaName = placemarks[0].locality!;
+    String streetName = placemarks[0].thoroughfare!;
+    String additionalInfo = placemarks[0].street!;
+
+    print(placemarks[0].locality!);
+    print(placemarks[0].administrativeArea!);
+    print(placemarks[0].street!);
+    print(placemarks[0].thoroughfare!);
 
     if (!mounted) return;
 
@@ -105,7 +112,7 @@ class _MapScreenState extends State<MapScreen> {
           title: const Text('Wanna Pick this Location?'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: [Text('At area: \n${areaName}'), Text(' ')],
+              children: [Text('At: \n${areaName}\n${streetName}')],
             ),
           ),
           actions: [
