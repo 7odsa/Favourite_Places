@@ -248,6 +248,10 @@ class _LocationInputState extends State<LocationInput> {
             //     ),
             //   ],
             // ),
+
+            // I decided to not use a marker because the marker has on click and change it's location
+            // whenever i clicked on the map and i wanna this map to be for previewing only
+            // and not for interacting with so instead i chosed to use a regular icon and center it
             Align(
               alignment: Alignment.center,
               child: const Icon(
