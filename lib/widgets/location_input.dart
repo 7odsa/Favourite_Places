@@ -1,17 +1,20 @@
+// import 'dart:typed_data';
+// import 'dart:ui' as ui;
+// import 'package:flutter/rendering.dart';
 import 'dart:io';
 
+import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:favorite_places/screens/map_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-// import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:location/location.dart';
 import 'package:latlong2/latlong.dart';
 
 class LocationInput extends StatefulWidget {
   const LocationInput({super.key, required this.onLocationPicked});
 
-  final void Function(LatLng location) onLocationPicked;
+  final void Function(LatLng location, String areaName) onLocationPicked;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -21,6 +24,18 @@ class _LocationInputState extends State<LocationInput> {
   LatLng? _pickedLocation;
   bool isGettingLocation = false;
   bool isThereConnection = false;
+  final _mapKey = GlobalKey();
+  Future<String?> get _getAreaName async {
+    List<geocoding.Placemark>? placemarks;
+    if (isThereConnection == true) {
+      placemarks = await geocoding.placemarkFromCoordinates(
+        52.2165157,
+        6.9437819,
+      );
+      print(placemarks[0].subLocality);
+    }
+    return placemarks?[0].thoroughfare ?? "";
+  }
 
   Future<void> _checkInternetConnection([
     void Function()? callingFunction,
@@ -113,11 +128,7 @@ class _LocationInputState extends State<LocationInput> {
 
     locationData = await location.getLocation();
 
-    // if (isThereConnection == true) {
-    //   List<geocoding.Placemark> placemarks = await geocoding
-    //       .placemarkFromCoordinates(52.2165157, 6.9437819);
-    //   print(placemarks[0].subLocality);
-    // }
+    String? areaName = await _getAreaName;
 
     setState(() {
       isGettingLocation = false;
@@ -126,7 +137,7 @@ class _LocationInputState extends State<LocationInput> {
       print(_pickedLocation!.longitude);
     });
 
-    widget.onLocationPicked(_pickedLocation!);
+    widget.onLocationPicked(_pickedLocation!, areaName ?? "");
 
     if (onLocationRetrieved != null) onLocationRetrieved();
   }
@@ -158,9 +169,32 @@ class _LocationInputState extends State<LocationInput> {
     _pickedLocation =
         (retrievedLocation != null) ? retrievedLocation : _pickedLocation;
     if (!mounted) return;
-    widget.onLocationPicked(_pickedLocation!);
+
+    String? areaName = await _getAreaName;
+
+    widget.onLocationPicked(_pickedLocation!, areaName ?? "");
     setState(() {});
   }
+
+  // void takeMapSnapShot() async {
+  //   try {
+  //     await WidgetsBinding.instance.endOfFrame;
+  //     RenderRepaintBoundary boundary =
+  //         _mapKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+  //     if (boundary.debugNeedsPaint) {
+  //       await Future.delayed(Duration(milliseconds: 20));
+  //       return takeMapSnapShot();
+  //     }
+  //     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+  //     ByteData? byteData = await image.toByteData(
+  //       format: ui.ImageByteFormat.png,
+  //     );
+  //     Uint8List pngBytes = byteData!.buffer.asUint8List();
+  //     print('Snapshot taken, bytes length: ${pngBytes.length}');
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -221,10 +255,13 @@ class _LocationInputState extends State<LocationInput> {
       tag: _pickedLocation!,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
+        // child: RepaintBoundary(
+        //   key: _mapKey,
         child: FlutterMap(
           options: MapOptions(
             initialCenter: _pickedLocation!,
             initialZoom: 15,
+
             // onTap: _onMapTapped,
             interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
           ),

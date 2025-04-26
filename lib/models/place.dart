@@ -10,10 +10,12 @@ class Place {
     required this.title,
     required this.imageFilePath,
     required this.location,
+    required this.areaName,
   }) : id = uuid.v4();
 
   final String id;
   final String title;
   final File imageFilePath;
   final LatLng location;
+  final String areaName;
 }

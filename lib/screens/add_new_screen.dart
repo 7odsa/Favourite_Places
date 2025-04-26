@@ -18,13 +18,14 @@ class AddNewScreen extends ConsumerWidget {
     String? _title;
     File? _imageFile;
     LatLng? _location;
-
+    String? _areaName;
     void _onSavePressed() {
       if (!_formKey.currentState!.validate() ||
           _imageFile == null ||
           _location == null)
         return;
       _formKey.currentState!.save();
+
       ref
           .read(placesProvider.notifier)
           .addnewPlace(
@@ -32,6 +33,7 @@ class AddNewScreen extends ConsumerWidget {
               title: _title!,
               imageFilePath: _imageFile!,
               location: _location!,
+              areaName: _areaName ?? "",
             ),
           );
       Navigator.of(context).pop();
@@ -68,9 +70,11 @@ class AddNewScreen extends ConsumerWidget {
                 ),
                 SizedBox(height: 8),
                 LocationInput(
-                  onLocationPicked: (location) {
+                  onLocationPicked: (location, areaName) {
                     _location = location;
+                    _areaName = areaName;
                     print(_location);
+                    print(_areaName);
                   },
                 ),
                 SizedBox(height: 16),
