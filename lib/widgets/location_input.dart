@@ -146,6 +146,8 @@ class _LocationInputState extends State<LocationInput> {
       return;
     }
 
+    if (!mounted) return;
+
     LatLng? retrievedLocation = await Navigator.of(context).push(
       MaterialPageRoute(
         fullscreenDialog: true,
@@ -165,11 +167,11 @@ class _LocationInputState extends State<LocationInput> {
     if (isGettingLocation == true) {
       content = CircularProgressIndicator();
     } else if (_pickedLocation == null) {
-      content = _showText("No Location Chosen Yet.");
+      content = _getText("No Location Chosen Yet.");
     } else if (isThereConnection) {
-      content = _showLocation();
+      content = _getLocationMap();
     } else {
-      content = _showText("No Internet Connection");
+      content = _getText("No Internet Connection");
     }
 
     return Column(
@@ -213,7 +215,7 @@ class _LocationInputState extends State<LocationInput> {
     );
   }
 
-  Widget _showLocation() {
+  Widget _getLocationMap() {
     return Hero(
       tag: _pickedLocation!,
       child: ClipRRect(
@@ -269,7 +271,7 @@ class _LocationInputState extends State<LocationInput> {
     );
   }
 
-  Widget _showText(String text) {
+  Widget _getText(String text) {
     return Text(
       text,
       textAlign: TextAlign.center,
