@@ -18,7 +18,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     Widget content =
         (isTapped)
             ? LocationMapSnapshot(
-              pickedLocation: widget.placeItem.location,
+              pickedLocation: widget.placeItem.locationInformation.location,
               onTap: (_, _) {
                 isTapped = false;
                 setState(() {});
@@ -57,7 +57,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         CircleAvatar(
                           radius: 80,
                           child: LocationMapSnapshot(
-                            pickedLocation: widget.placeItem.location,
+                            pickedLocation:
+                                widget.placeItem.locationInformation.location,
                             onTap: (_, _) {
                               isTapped = true;
                               setState(() {});
@@ -66,7 +67,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          widget.placeItem.areaName,
+                          widget.placeItem.locationInformation.areaName,
                           style: TextTheme.of(context).titleLarge,
                         ),
                       ],

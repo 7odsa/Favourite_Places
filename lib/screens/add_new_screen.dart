@@ -32,8 +32,10 @@ class AddNewScreen extends ConsumerWidget {
             Place(
               title: _title!,
               imageFilePath: _imageFile!,
-              location: _location!,
-              areaName: _areaName ?? "",
+              locationInformation: LocationInformation(
+                location: _location!,
+                areaName: _areaName ?? "",
+              ),
             ),
           );
       Navigator.of(context).pop();

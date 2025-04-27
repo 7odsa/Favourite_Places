@@ -27,7 +27,7 @@ class PlacesListWidget extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          subtitle: Text(placesList[index].areaName),
+          subtitle: Text(placesList[index].locationInformation.areaName),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
