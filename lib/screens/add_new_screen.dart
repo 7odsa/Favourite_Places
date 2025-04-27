@@ -7,6 +7,7 @@ import 'package:favorite_places/widgets/image_input.dart';
 import 'package:favorite_places/widgets/location_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 
 class AddNewScreen extends ConsumerWidget {
   const AddNewScreen({super.key});
@@ -16,60 +17,83 @@ class AddNewScreen extends ConsumerWidget {
     final _formKey = GlobalKey<FormState>();
     String? _title;
     File? _imageFile;
-
+    LatLng? _location;
+    String? _areaName;
     void _onSavePressed() {
-      if (!_formKey.currentState!.validate() || _imageFile == null) return;
+      if (!_formKey.currentState!.validate() ||
+          _imageFile == null ||
+          _location == null)
+        return;
       _formKey.currentState!.save();
+
       ref
           .read(placesProvider.notifier)
-          .addnewPlace(Place(title: _title!, imageFilePath: _imageFile!));
+          .addnewPlace(
+            Place(
+              title: _title!,
+              imageFilePath: _imageFile!,
+              locationInformation: LocationInformation(
+                location: _location!,
+                areaName: _areaName ?? "",
+              ),
+            ),
+          );
       Navigator.of(context).pop();
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text("Add New Place")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                style: white16,
-                decoration: InputDecoration(labelText: "Title"),
-                maxLines: 1,
-                maxLength: 50,
-                onSaved: (newValue) {
-                  _title = newValue;
-                },
-                validator: (value) {
-                  // TODO
-                  if (value == null || value.isEmpty) return "a7a";
-                  return null;
-                },
-              ),
-              SizedBox(height: 8),
-              ImageInput(
-                onImagePicked: (imageFile) {
-                  _imageFile = imageFile;
-                },
-              ),
-              SizedBox(height: 8),
-              LocationInput(),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _onSavePressed,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.add),
-                    SizedBox(width: 8),
-                    Text("Add Place"),
-                  ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text("Add New Place")),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  style: white16,
+                  decoration: InputDecoration(labelText: "Title"),
+                  maxLines: 1,
+                  maxLength: 50,
+                  onSaved: (newValue) {
+                    _title = newValue;
+                  },
+                  validator: (value) {
+                    // TODO
+                    if (value == null || value.isEmpty) return "a7a";
+                    return null;
+                  },
                 ),
-              ),
-            ],
+                SizedBox(height: 8),
+                ImageInput(
+                  onImagePicked: (imageFile) {
+                    _imageFile = imageFile;
+                  },
+                ),
+                SizedBox(height: 8),
+                LocationInput(
+                  onLocationPicked: (location, areaName) {
+                    _location = location;
+                    _areaName = areaName;
+                    print(_location);
+                    print(_areaName);
+                  },
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _onSavePressed,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.add),
+                      SizedBox(width: 8),
+                      Text("Add Place"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
