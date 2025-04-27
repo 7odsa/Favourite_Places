@@ -3,6 +3,7 @@
 // import 'package:flutter/rendering.dart';
 import 'dart:io';
 
+import 'package:favorite_places/widgets/location_map_snapshot.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:favorite_places/screens/map_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -204,7 +205,7 @@ class _LocationInputState extends State<LocationInput> {
     } else if (_pickedLocation == null) {
       content = _getText("No Location Chosen Yet.");
     } else if (isThereConnection) {
-      content = _getLocationMap();
+      content = LocationMapSnapshot(pickedLocation: _pickedLocation!);
     } else {
       content = _getText("No Internet Connection");
     }
@@ -247,69 +248,6 @@ class _LocationInputState extends State<LocationInput> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _getLocationMap() {
-    return Hero(
-      tag: _pickedLocation!,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        // child: RepaintBoundary(
-        //   key: _mapKey,
-        child: FlutterMap(
-          options: MapOptions(
-            initialCenter: _pickedLocation!,
-            initialZoom: 15,
-
-            // onTap: _onMapTapped,
-            interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
-          ),
-          children: [
-            TileLayer(
-              urlTemplate:
-                  'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
-              additionalOptions: const {'hl': 'ar'},
-
-              userAgentPackageName: 'com..app',
-              subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
-            ),
-            // MarkerLayer(
-            //   markers: [
-            //     Marker(
-            //       point: _pickedLocation!,
-            //       child: const Icon(
-            //         Icons.location_on,
-            //         size: 35,
-            //         color: Colors.blue,
-            //       ),
-            //     ),
-            //   ],
-            // ),
-
-            // I decided to not use a marker because the marker has on click and change it's location
-            // whenever i clicked on the map and i wanna this map to be for previewing only
-            // and not for interacting with so instead i chosed to use a regular icon and center it
-            Align(
-              alignment: Alignment.center,
-              child: const Icon(
-                Icons.location_on,
-                size: 35,
-                color: Colors.blue,
-              ),
-            ),
-            Align(
-              alignment: Alignment(0, -0.35),
-              child: Text(
-                "Your current Location",
-                style: TextTheme.of(context).titleMedium!.copyWith(
-                  color: const Color.fromARGB(255, 0, 108, 197),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
