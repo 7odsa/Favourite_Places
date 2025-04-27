@@ -114,42 +114,42 @@ class _MapScreenState extends State<MapScreen> {
     // print(placemarks[0].street!);
     // print(placemarks[0].thoroughfare!);
 
-    if (!mounted) return;
+    // if (!mounted) return;
 
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: const Text('Wanna Pick this Location?'),
-          // content: SingleChildScrollView(
-          //   child: ListBody(children: [Text('At: \n$areaName\n$streetName')]),
-          // ),
-          actions: [
-            TextButton(
-              child: const Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(
-                'Yep!',
-                style: TextTheme.of(context).titleMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _onPickedLocation(_chosedLocation);
-              },
-            ),
-          ],
-        );
-      },
-    );
+    // await showDialog<void>(
+    //   context: context,
+    //   barrierDismissible: false, // user must tap button!
+    //   builder: (BuildContext context) {
+    //     return CupertinoAlertDialog(
+    //       title: const Text('Wanna Pick this Location?'),
+    //       // content: SingleChildScrollView(
+    //       //   child: ListBody(children: [Text('At: \n$areaName\n$streetName')]),
+    //       // ),
+    //       actions: [
+    //         TextButton(
+    //           child: const Text('No'),
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+    //           },
+    //         ),
+    //         TextButton(
+    //           child: Text(
+    //             'Yep!',
+    //             style: TextTheme.of(context).titleMedium!.copyWith(
+    //               color: Theme.of(context).colorScheme.onSurface,
+    //             ),
+    //           ),
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+    //             _onPickedLocation(_chosedLocation);
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
 
-    setState(() {});
+    // setState(() {});
     // print(_chosedLocation);
   }
 

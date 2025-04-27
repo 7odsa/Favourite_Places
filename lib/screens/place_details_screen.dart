@@ -34,7 +34,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                   child: Container(
                     decoration: BoxDecoration(color: Colors.amber),
                     child: Text(
-                      "Place Any Where To Go Back",
+                      "Press Any Where To Go Back",
                       style: TextTheme.of(context).titleLarge!.copyWith(
                         color: Theme.of(context).colorScheme.primaryContainer,
                       ),

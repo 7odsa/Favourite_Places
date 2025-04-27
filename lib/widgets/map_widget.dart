@@ -49,7 +49,10 @@ class _MapWidgetState extends State<MapWidget> {
             initialCenter: _chosedLocation,
             initialZoom: 15,
             onTap: (tapPosition, point) {
-              if (widget.isSelecting) _chosedLocation = point;
+              if (widget.isSelecting) {
+                _chosedLocation = point;
+                setState(() {});
+              }
               if (widget.onTap != null) widget.onTap!(tapPosition, point);
             },
             interactionOptions: InteractionOptions(
@@ -68,31 +71,31 @@ class _MapWidgetState extends State<MapWidget> {
               userAgentPackageName: 'com..app',
               subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
             ),
-            (widget.isSelecting)
-                ? MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _chosedLocation,
-                      child: const Icon(
-                        Icons.location_on,
-                        size: 35,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                )
-                :
-                // I decided to not use a marker because the marker has on click and change it's location
-                // whenever i clicked on the map and i wanna this map to be for previewing only
-                // and not for interacting with so instead i chosed to use a regular icon and center it
-                Align(
-                  alignment: Alignment.center,
+            MarkerLayer(
+              rotate: true,
+              markers: [
+                Marker(
+                  point: _chosedLocation,
                   child: const Icon(
                     Icons.location_on,
                     size: 35,
                     color: Colors.blue,
                   ),
                 ),
+              ],
+            ),
+            // :
+            // I decided to not use a marker because the marker has on click and change it's location
+            // whenever i clicked on the map and i wanna this map to be for previewing only
+            // and not for interacting with so instead i chosed to use a regular icon and center it
+            // Align(
+            //   alignment: Alignment.center,
+            //   child: const Icon(
+            //     Icons.location_on,
+            //     size: 35,
+            //     color: Colors.blue,
+            //   ),
+            // ),
             if (widget.isSelecting)
               Align(
                 alignment: Alignment.bottomRight,
