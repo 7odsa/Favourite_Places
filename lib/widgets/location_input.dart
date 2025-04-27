@@ -3,7 +3,7 @@
 // import 'package:flutter/rendering.dart';
 import 'dart:io';
 
-import 'package:favorite_places/widgets/location_map_snapshot.dart';
+import 'package:favorite_places/widgets/map_widget.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:favorite_places/screens/map_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -208,14 +208,16 @@ class _LocationInputState extends State<LocationInput> {
     } else if (_pickedLocation == null) {
       content = _getText("No Location Chosen Yet.");
     } else if (isThereConnection) {
-      content = LocationMapSnapshot(
+      content = MapWidget(
         // Here We should add key to make the state object know that the widget changed and that it is
         key: ObjectKey(_pickedLocation!),
         pickedLocation: _pickedLocation!,
         isSelecting: false,
       );
     } else {
-      content = _getText("No Internet Connection");
+      content = _getText(
+        "No Internet Connection to show map, But your Location is Saved.",
+      );
     }
 
     return Column(

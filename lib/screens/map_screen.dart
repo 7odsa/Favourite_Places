@@ -1,8 +1,7 @@
-import 'package:favorite_places/widgets/location_map_snapshot.dart';
+import 'package:favorite_places/widgets/map_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapScreen extends StatefulWidget {
@@ -40,7 +39,7 @@ class _MapScreenState extends State<MapScreen> {
           centerTitle: true,
           title: Text(widget.isSelecting ? "Pick a Location" : "Your Location"),
         ),
-        body: LocationMapSnapshot(
+        body: MapWidget(
           pickedLocation: _chosedLocation,
           isSelecting: true,
           onTap: _onMapTapped,

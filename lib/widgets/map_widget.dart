@@ -2,13 +2,12 @@
 // import 'dart:ui' as ui;
 // import 'package:flutter/rendering.dart';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-class LocationMapSnapshot extends StatefulWidget {
-  const LocationMapSnapshot({
+class MapWidget extends StatefulWidget {
+  const MapWidget({
     super.key,
     required this.pickedLocation,
     this.onTap,
@@ -23,10 +22,10 @@ class LocationMapSnapshot extends StatefulWidget {
   final bool isSelecting;
 
   @override
-  State<LocationMapSnapshot> createState() => _LocationMapSnapshotState();
+  State<MapWidget> createState() => _MapWidgetState();
 }
 
-class _LocationMapSnapshotState extends State<LocationMapSnapshot> {
+class _MapWidgetState extends State<MapWidget> {
   late LatLng _chosedLocation;
   late LatLng _initLocation;
 

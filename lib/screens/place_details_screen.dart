@@ -1,5 +1,5 @@
 import 'package:favorite_places/models/place.dart';
-import 'package:favorite_places/widgets/location_map_snapshot.dart';
+import 'package:favorite_places/widgets/map_widget.dart';
 import 'package:flutter/material.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
         (isTapped)
             ? Stack(
               children: [
-                LocationMapSnapshot(
+                MapWidget(
                   pickedLocation: widget.placeItem.locationInformation.location,
                   onTap: (_, _) {
                     isTapped = false;
@@ -76,7 +76,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                       children: [
                         CircleAvatar(
                           radius: 80,
-                          child: LocationMapSnapshot(
+                          child: MapWidget(
                             pickedLocation:
                                 widget.placeItem.locationInformation.location,
                             onTap: (_, _) {
