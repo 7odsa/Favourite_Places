@@ -17,12 +17,32 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   Widget build(BuildContext context) {
     Widget content =
         (isTapped)
-            ? LocationMapSnapshot(
-              pickedLocation: widget.placeItem.locationInformation.location,
-              onTap: (_, _) {
-                isTapped = false;
-                setState(() {});
-              },
+            ? Stack(
+              children: [
+                LocationMapSnapshot(
+                  pickedLocation: widget.placeItem.locationInformation.location,
+                  onTap: (_, _) {
+                    isTapped = false;
+                    setState(() {});
+                  },
+                  isSelecting: false,
+                ),
+                Positioned(
+                  bottom: 10,
+                  right: 0,
+                  left: 0,
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.amber),
+                    child: Text(
+                      "Place Any Where To Go Back",
+                      style: TextTheme.of(context).titleLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
             )
             : Stack(
               alignment: Alignment.center,
@@ -63,6 +83,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                               isTapped = true;
                               setState(() {});
                             },
+                            isSelecting: false,
                           ),
                         ),
                         SizedBox(height: 8),

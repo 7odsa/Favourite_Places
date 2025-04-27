@@ -163,7 +163,10 @@ class _LocationInputState extends State<LocationInput> {
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (context) {
-          return MapScreen(currentLocation: _pickedLocation!);
+          return MapScreen(
+            currentLocation: _pickedLocation!,
+            isSelecting: true,
+          );
         },
       ),
     );
@@ -205,7 +208,12 @@ class _LocationInputState extends State<LocationInput> {
     } else if (_pickedLocation == null) {
       content = _getText("No Location Chosen Yet.");
     } else if (isThereConnection) {
-      content = LocationMapSnapshot(pickedLocation: _pickedLocation!);
+      content = LocationMapSnapshot(
+        // Here We should add key to make the state object know that the widget changed and that it is
+        key: ObjectKey(_pickedLocation!),
+        pickedLocation: _pickedLocation!,
+        isSelecting: false,
+      );
     } else {
       content = _getText("No Internet Connection");
     }

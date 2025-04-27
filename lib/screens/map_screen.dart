@@ -1,3 +1,4 @@
+import 'package:favorite_places/widgets/location_map_snapshot.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -5,8 +6,15 @@ import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key, required this.currentLocation});
+  const MapScreen({
+    super.key,
+    required this.currentLocation,
+    this.isSelecting = false,
+    this.onTap,
+  });
   final LatLng currentLocation;
+  final bool isSelecting;
+  final void Function(TapPosition, LatLng)? onTap;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -30,63 +38,15 @@ class _MapScreenState extends State<MapScreen> {
             onPressed: onBackButtonPressed,
           ),
           centerTitle: true,
-          title: Text("Pick a Location"),
+          title: Text(widget.isSelecting ? "Pick a Location" : "Your Location"),
         ),
-        body: Hero(
-          tag: _chosedLocation,
-          child: FlutterMap(
-            options: MapOptions(
-              initialZoom: 15,
-              initialCenter: _chosedLocation,
-              onTap: _onMapTapped,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate:
-                    'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
-                additionalOptions: const {'hl': 'ar'},
-                subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    rotate: true,
-                    point: _chosedLocation,
-                    child: const Icon(
-                      Icons.location_on,
-                      size: 35,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
-              ),
-
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton.icon(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.amberAccent),
-                    elevation: WidgetStatePropertyAll(12),
-                  ),
-                  onPressed: () {
-                    _chosedLocation = widget.currentLocation;
-                    setState(() {});
-                  },
-                  icon: Icon(
-                    Icons.location_history,
-                    color: Colors.blue,
-                    size: 24,
-                  ),
-                  label: Text(
-                    "Back to Your current location",
-                    style: TextTheme.of(
-                      context,
-                    ).bodyLarge!.copyWith(color: Colors.blue),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        body: LocationMapSnapshot(
+          pickedLocation: _chosedLocation,
+          isSelecting: true,
+          onTap: _onMapTapped,
+          onbackToCurrentLocationPressed: (newPoint) {
+            _chosedLocation = newPoint;
+          },
         ),
       ),
     );
@@ -141,13 +101,13 @@ class _MapScreenState extends State<MapScreen> {
   void _onMapTapped(TapPosition tapPosition, LatLng point) async {
     _chosedLocation = point;
 
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      _chosedLocation.latitude,
-      _chosedLocation.longitude,
-    );
+    // List<Placemark> placemarks = await placemarkFromCoordinates(
+    //   _chosedLocation.latitude,
+    //   _chosedLocation.longitude,
+    // );
 
-    String areaName = placemarks[0].locality!;
-    String streetName = placemarks[0].thoroughfare!;
+    // String areaName = placemarks[0].locality!;
+    // String streetName = placemarks[0].thoroughfare!;
     // String additionalInfo = placemarks[0].street!;
 
     // print(placemarks[0].locality!);
@@ -157,15 +117,15 @@ class _MapScreenState extends State<MapScreen> {
 
     if (!mounted) return;
 
-    showDialog<void>(
+    await showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
           title: const Text('Wanna Pick this Location?'),
-          content: SingleChildScrollView(
-            child: ListBody(children: [Text('At: \n$areaName\n$streetName')]),
-          ),
+          // content: SingleChildScrollView(
+          //   child: ListBody(children: [Text('At: \n$areaName\n$streetName')]),
+          // ),
           actions: [
             TextButton(
               child: const Text('No'),
