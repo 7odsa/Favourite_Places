@@ -1,12 +1,21 @@
+// import 'dart:typed_data';
+// import 'dart:ui' as ui;
+// import 'package:flutter/rendering.dart';
+import 'dart:io';
+
+import 'package:favorite_places/widgets/map_widget.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:favorite_places/screens/map_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:location/location.dart';
 import 'package:latlong2/latlong.dart';
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  const LocationInput({super.key, required this.onLocationPicked});
+
+  final void Function(LatLng location, String areaName) onLocationPicked;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -15,8 +24,83 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   LatLng? _pickedLocation;
   bool isGettingLocation = false;
+  bool isThereConnection = false;
+  final _mapKey = GlobalKey();
+  Future<String?> get _getAreaName async {
+    List<geocoding.Placemark>? placemarks;
+    if (isThereConnection == true) {
+      placemarks = await geocoding.placemarkFromCoordinates(
+        52.2165157,
+        6.9437819,
+      );
+      print(placemarks[0].subLocality);
+    }
+    return placemarks?[0].thoroughfare ?? "";
+  }
 
-  void _getCurrentLocation() async {
+  Future<void> _checkInternetConnection([
+    void Function()? callingFunction,
+  ]) async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+      }
+    } on SocketException catch (_) {
+      print('not connected');
+
+      setState(() {
+        isThereConnection = false;
+      });
+      _showDialog(
+        title: "No Internet Connection",
+        content:
+            "Your current location saved. \nBut can't show the Map, Due to connection Lost.",
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              callingFunction?.call();
+            },
+            child: Text("Try Again"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("Ok"),
+          ),
+        ],
+      );
+      // AlertDialog(
+      //   title: Text(),
+      //   content: Text(),
+      // );
+      return;
+    }
+
+    setState(() {
+      isThereConnection = true;
+    });
+  }
+
+  void _showDialog({String? title, String? content, List<Widget>? actions}) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(title ?? ""),
+          content: SingleChildScrollView(
+            child: ListBody(children: [Text(content ?? "")]),
+          ),
+          actions: actions ?? [],
+        );
+      },
+    );
+  }
+
+  void _getCurrentLocation([void Function()? onLocationRetrieved]) async {
     setState(() {
       isGettingLocation = true;
     });
@@ -44,76 +128,97 @@ class _LocationInputState extends State<LocationInput> {
     }
 
     locationData = await location.getLocation();
-    List<geocoding.Placemark> placemarks = await geocoding
-        .placemarkFromCoordinates(52.2165157, 6.9437819);
-    print(placemarks[0].street);
+
+    String? areaName = await _getAreaName;
+
     setState(() {
       isGettingLocation = false;
       _pickedLocation = LatLng(locationData.latitude!, locationData.longitude!);
+      print(_pickedLocation!.latitude);
+      print(_pickedLocation!.longitude);
     });
+
+    widget.onLocationPicked(_pickedLocation!, areaName ?? "");
+
+    if (onLocationRetrieved != null) onLocationRetrieved();
   }
+
+  void onGetCurrentLocatiomnPressed() async {
+    await _checkInternetConnection(onGetCurrentLocatiomnPressed);
+    _getCurrentLocation();
+  }
+
+  void onPickLocationPressed() async {
+    await _checkInternetConnection(onPickLocationPressed);
+    if (!isThereConnection || isGettingLocation) return;
+
+    if (_pickedLocation == null) {
+      _getCurrentLocation(onPickLocationPressed);
+      return;
+    }
+
+    if (!mounted) return;
+
+    LatLng? retrievedLocation = await Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) {
+          return MapScreen(
+            currentLocation: _pickedLocation!,
+            isSelecting: true,
+          );
+        },
+      ),
+    );
+    _pickedLocation =
+        (retrievedLocation != null) ? retrievedLocation : _pickedLocation;
+    if (!mounted) return;
+
+    String? areaName = await _getAreaName;
+
+    widget.onLocationPicked(_pickedLocation!, areaName ?? "");
+    setState(() {});
+  }
+
+  // void takeMapSnapShot() async {
+  //   try {
+  //     await WidgetsBinding.instance.endOfFrame;
+  //     RenderRepaintBoundary boundary =
+  //         _mapKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+  //     if (boundary.debugNeedsPaint) {
+  //       await Future.delayed(Duration(milliseconds: 20));
+  //       return takeMapSnapShot();
+  //     }
+  //     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+  //     ByteData? byteData = await image.toByteData(
+  //       format: ui.ImageByteFormat.png,
+  //     );
+  //     Uint8List pngBytes = byteData!.buffer.asUint8List();
+  //     print('Snapshot taken, bytes length: ${pngBytes.length}');
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    Widget content =
-        isGettingLocation == true
-            ? CircularProgressIndicator()
-            : (_pickedLocation == null)
-            ? Text(
-              "No Location Chosen Yet.",
-              textAlign: TextAlign.center,
-              style: TextTheme.of(context).bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            )
-            : ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: _pickedLocation!,
-                  initialZoom: 15,
-                  onTap: _onMapTapped,
-                  interactionOptions: InteractionOptions(
-                    flags: InteractiveFlag.none,
-                  ),
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
-                    additionalOptions: const {'hl': 'ar'},
-
-                    userAgentPackageName: 'com..app',
-                    subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
-                  ),
-                  // MarkerLayer(
-                  //   markers: [
-                  //     Marker(
-                  //       point: _pickedLocation!,
-                  //       child: Icon(Icons.location_on),
-                  //     ),
-                  //   ],
-                  // ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.location_on,
-                      size: 35,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment(0, -0.35),
-                    child: Text(
-                      "Your current Location",
-                      style: TextTheme.of(context).titleMedium!.copyWith(
-                        color: const Color.fromARGB(255, 0, 108, 197),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+    Widget content;
+    if (isGettingLocation == true) {
+      content = CircularProgressIndicator();
+    } else if (_pickedLocation == null) {
+      content = _getText("No Location Chosen Yet.");
+    } else if (isThereConnection) {
+      content = MapWidget(
+        // Here We should add key to make the state object know that the widget changed and that it is
+        key: ObjectKey(_pickedLocation!),
+        pickedLocation: _pickedLocation!,
+        isSelecting: false,
+      );
+    } else {
+      content = _getText(
+        "No Internet Connection to show map, But your Location is Saved.",
+      );
+    }
 
     return Column(
       children: [
@@ -135,9 +240,7 @@ class _LocationInputState extends State<LocationInput> {
           children: [
             TextButton.icon(
               icon: Icon(Icons.location_on, size: 24),
-              onPressed: () {
-                _getCurrentLocation();
-              },
+              onPressed: onGetCurrentLocatiomnPressed,
               label: Text("Get current Location"),
             ),
             Text(
@@ -149,11 +252,7 @@ class _LocationInputState extends State<LocationInput> {
             ),
             TextButton.icon(
               icon: Icon(Icons.map, size: 24),
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => MapScreen()));
-              },
+              onPressed: onPickLocationPressed,
               label: Text("Pick a Location"),
             ),
           ],
@@ -162,8 +261,19 @@ class _LocationInputState extends State<LocationInput> {
     );
   }
 
-  void _onMapTapped(TapPosition tapPosition, LatLng point) {
-    _pickedLocation = point;
-    setState(() {});
+  Widget _getText(String text) {
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: TextTheme.of(
+        context,
+      ).bodyLarge!.copyWith(color: Theme.of(context).colorScheme.onSurface),
+    );
   }
+
+  // void _onMapTapped(TapPosition tapPosition, LatLng point) {
+  //   _pickedLocation = point;
+  //   print(_pickedLocation);
+  //   setState(() {});
+  // }
 }
