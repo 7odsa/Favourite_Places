@@ -14,27 +14,29 @@ class AddNewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final _formKey = GlobalKey<FormState>();
-    String? _title;
-    File? _imageFile;
-    LatLng? _location;
-    String? _areaName;
-    void _onSavePressed() {
-      if (!_formKey.currentState!.validate() ||
-          _imageFile == null ||
-          _location == null)
+    final formKey = GlobalKey<FormState>();
+    String? title;
+    File? imageFile;
+    LatLng? location;
+    String? areaName;
+
+    void onSavePressed() {
+      if (!formKey.currentState!.validate() ||
+          imageFile == null ||
+          location == null) {
         return;
-      _formKey.currentState!.save();
+      }
+      formKey.currentState!.save();
 
       ref
           .read(placesProvider.notifier)
           .addnewPlace(
             Place(
-              title: _title!,
-              imageFilePath: _imageFile!,
+              title: title!,
+              imageFilePath: imageFile,
               locationInformation: LocationInformation(
-                location: _location!,
-                areaName: _areaName ?? "",
+                location: location,
+                areaName: areaName ?? "",
               ),
             ),
           );
@@ -47,7 +49,7 @@ class AddNewScreen extends ConsumerWidget {
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               children: [
                 TextFormField(
@@ -56,7 +58,7 @@ class AddNewScreen extends ConsumerWidget {
                   maxLines: 1,
                   maxLength: 50,
                   onSaved: (newValue) {
-                    _title = newValue;
+                    title = newValue;
                   },
                   validator: (value) {
                     // TODO
@@ -67,21 +69,21 @@ class AddNewScreen extends ConsumerWidget {
                 SizedBox(height: 8),
                 ImageInput(
                   onImagePicked: (imageFile) {
-                    _imageFile = imageFile;
+                    imageFile = imageFile;
                   },
                 ),
                 SizedBox(height: 8),
                 LocationInput(
                   onLocationPicked: (location, areaName) {
-                    _location = location;
-                    _areaName = areaName;
-                    print(_location);
-                    print(_areaName);
+                    location = location;
+                    areaName = areaName;
+                    print(location);
+                    print(areaName);
                   },
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: _onSavePressed,
+                  onPressed: onSavePressed,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,

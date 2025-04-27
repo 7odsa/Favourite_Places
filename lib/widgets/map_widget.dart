@@ -106,8 +106,9 @@ class _MapWidgetState extends State<MapWidget> {
                   ),
                   onPressed: () {
                     _chosedLocation = _initLocation;
-                    if (widget.onbackToCurrentLocationPressed != null)
+                    if (widget.onbackToCurrentLocationPressed != null) {
                       widget.onbackToCurrentLocationPressed!(_chosedLocation);
+                    }
                     setState(() {});
                   },
                   icon: Icon(
