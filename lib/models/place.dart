@@ -8,14 +8,26 @@ const uuid = Uuid();
 class Place {
   Place({
     required this.title,
-    required this.imageFilePath,
+    required this.imageFile,
     required this.locationInformation,
   }) : id = uuid.v4();
 
   final String id;
   final String title;
-  final File imageFilePath;
+  final File imageFile;
   final LocationInformation locationInformation;
+
+  Place copyWith({
+    String? newTitle,
+    File? newImageFile,
+    LocationInformation? newLocationInformation,
+  }) {
+    return Place(
+      title: newTitle ?? title,
+      imageFile: newImageFile ?? imageFile,
+      locationInformation: newLocationInformation ??= locationInformation,
+    );
+  }
 }
 
 class LocationInformation {

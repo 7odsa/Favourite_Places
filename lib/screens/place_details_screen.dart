@@ -50,7 +50,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 Hero(
                   tag: widget.placeItem,
                   child: Image.file(
-                    widget.placeItem.imageFilePath,
+                    widget.placeItem.imageFile,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,

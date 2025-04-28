@@ -18,7 +18,7 @@ class PlacesListWidget extends StatelessWidget {
             tag: placesList[index],
             child: CircleAvatar(
               radius: 26,
-              backgroundImage: FileImage(placesList[index].imageFilePath),
+              backgroundImage: FileImage(placesList[index].imageFile),
             ),
           ),
           title: Text(

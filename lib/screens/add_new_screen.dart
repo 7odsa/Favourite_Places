@@ -33,7 +33,7 @@ class AddNewScreen extends ConsumerWidget {
           .addnewPlace(
             Place(
               title: title!,
-              imageFilePath: imageFile,
+              imageFile: imageFile,
               locationInformation: LocationInformation(
                 location: location,
                 areaName: areaName ?? "",
