@@ -16,9 +16,7 @@ class PlacesNotifier extends Notifier<List<Place>> {
   void addnewPlace(Place place) async {
     final appDir = await sysPath.getApplicationDocumentsDirectory();
     final imagePath = path.basename(place.imageFile.path);
-    final copiedImage = await place.imageFile.copy(
-      "${appDir.path}/$imagePath.png",
-    );
+    final copiedImage = await place.imageFile.copy("${appDir.path}/$imagePath");
     final newPlace = place.copyWith(newImageFile: copiedImage);
     state = [newPlace, ...state];
   }
