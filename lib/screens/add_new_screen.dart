@@ -14,29 +14,29 @@ class AddNewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = GlobalKey<FormState>();
-    String? title;
-    File? imageFile;
-    LatLng? location;
-    String? areaName;
+    final _formKey = GlobalKey<FormState>();
+    String? _title;
+    File? _imageFile;
+    LatLng? _location;
+    String? _areaName;
 
     void onSavePressed() {
-      if (!formKey.currentState!.validate() ||
-          imageFile == null ||
-          location == null) {
+      if (!_formKey.currentState!.validate() ||
+          _imageFile == null ||
+          _location == null) {
         return;
       }
-      formKey.currentState!.save();
+      _formKey.currentState!.save();
 
       ref
           .read(placesProvider.notifier)
           .addnewPlace(
             Place(
-              title: title!,
-              imageFile: imageFile,
+              title: _title!,
+              imageFile: _imageFile!,
               locationInformation: LocationInformation(
-                location: location,
-                areaName: areaName ?? "",
+                location: _location!,
+                areaName: _areaName ?? "",
               ),
             ),
           );
@@ -49,7 +49,7 @@ class AddNewScreen extends ConsumerWidget {
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
           child: Form(
-            key: formKey,
+            key: _formKey,
             child: Column(
               children: [
                 TextFormField(
@@ -58,7 +58,7 @@ class AddNewScreen extends ConsumerWidget {
                   maxLines: 1,
                   maxLength: 50,
                   onSaved: (newValue) {
-                    title = newValue;
+                    _title = newValue;
                   },
                   validator: (value) {
                     // TODO
@@ -69,14 +69,14 @@ class AddNewScreen extends ConsumerWidget {
                 SizedBox(height: 8),
                 ImageInput(
                   onImagePicked: (imageFile) {
-                    imageFile = imageFile;
+                    _imageFile = imageFile;
                   },
                 ),
                 SizedBox(height: 8),
                 LocationInput(
                   onLocationPicked: (location, areaName) {
-                    location = location;
-                    areaName = areaName;
+                    _location = location;
+                    _areaName = areaName;
                     print(location);
                     print(areaName);
                   },

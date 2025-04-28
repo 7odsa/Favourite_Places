@@ -46,11 +46,14 @@ class _ImageInputState extends State<ImageInput> {
         onTap: () {
           _takePicture();
         },
-        child: Image.file(
-          _selectedImage!,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.file(
+            _selectedImage!,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
         ),
       );
     }

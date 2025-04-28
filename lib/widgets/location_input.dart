@@ -24,7 +24,6 @@ class _LocationInputState extends State<LocationInput> {
   LatLng? _pickedLocation;
   bool isGettingLocation = false;
   bool isThereConnection = false;
-  final _mapKey = GlobalKey();
   Future<String?> get _getAreaName async {
     List<geocoding.Placemark>? placemarks;
     if (isThereConnection == true) {
