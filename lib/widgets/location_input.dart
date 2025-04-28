@@ -28,8 +28,8 @@ class _LocationInputState extends State<LocationInput> {
     List<geocoding.Placemark>? placemarks;
     if (isThereConnection == true) {
       placemarks = await geocoding.placemarkFromCoordinates(
-        52.2165157,
-        6.9437819,
+        _pickedLocation?.latitude ?? 0,
+        _pickedLocation?.longitude ?? 0,
       );
       print(placemarks[0].subLocality);
     }
@@ -127,14 +127,13 @@ class _LocationInputState extends State<LocationInput> {
 
     locationData = await location.getLocation();
 
-    String? areaName = await _getAreaName;
-
     setState(() {
       isGettingLocation = false;
       _pickedLocation = LatLng(locationData.latitude!, locationData.longitude!);
       print(_pickedLocation!.latitude);
       print(_pickedLocation!.longitude);
     });
+    String? areaName = await _getAreaName;
 
     widget.onLocationPicked(_pickedLocation!, areaName ?? "");
 
